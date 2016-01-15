@@ -6,6 +6,8 @@ Possibly useful for bhyve users.
 
 ## Requirements
 
-* Python
-* Jinja
-* mkisofs
+* Python 2.7 plus:
+  * Jinja2
+  * YAML
+  
+* ``mkisofs`` from [cdrtools](http://sourceforge.net/projects/cdrtools/)
