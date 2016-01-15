@@ -2,7 +2,7 @@
 
 Create OpenStack config drive ISOs for injecting into virtual machines.
 
-Possibly useful for bhyve users.
+Possibly useful for [bhyve](http://bhyve.org/) users.
 
 ## Requirements
 
