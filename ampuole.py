@@ -12,7 +12,7 @@ import tempfile
 import uuid
 import yaml
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 
 USER_DATA_JINJA = """
 # Default user data YAML file does nothing
@@ -182,8 +182,8 @@ class Ampuole:
         
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-i', '--inject-directory', nargs=2, default='inject', help="Directory of files to inject into config drive")
-    parser.add_argument('-o', '--output', default='configdrive.iso', help="Outpuit ISO file name")
+    parser.add_argument('-i', '--inject-directory', default='inject', help="Directory of files to inject into config drive")
+    parser.add_argument('-o', '--output', default='configdrive.iso', help="Output ISO file name")
     parser.add_argument('-s', '--ssh-key-directory', default='ssh', help="Directory of SSH public key files for administrator account")
     parser.add_argument('-u', '--user-data-template', default='user_data.jinja')
     parser.add_argument('guestname', default=None, help="Hostname of guest machine")
