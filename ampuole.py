@@ -165,7 +165,7 @@ class Ampuole:
         ]
         for i in self._inject:
             logging.debug(i)
-            graft = '{}={}'.format(i['isopath'], i['local']))
+            graft = '{}={}'.format(i['isopath'], i['local'])
             cmd.append(graft)
         logging.debug(cmd)
         subprocess.check_call(cmd)
