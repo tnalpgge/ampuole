@@ -45,12 +45,21 @@ class Ampuole:
         }
 
     def explore_user_data(self):
+        """
+        Render the user data template and see if it is valid YAML.
+        """
         template = self._j2.get_template(self.user_data_template)
         rawyaml = template.render(self.values)
         logging.debug(rawyaml)
         self._cloudconfig = yaml.load(rawyaml)
 
     def gather_ssh_keys(self):
+        """
+        Walk the indicated directory, assume all files in it (recursively)
+        are SSH public keys.  Make available to both metadata and
+        user data.
+
+        """
         for dirpath, dirnames, filenames in os.walk(self.ssh_key_directory):
             for f in filenames:
                 try:
@@ -71,6 +80,12 @@ class Ampuole:
             pass
 
     def gather_injections(self):
+        """
+        Walk a directory structure and collect information needed to
+        inject those files in the requested place on the config drive
+        (and eventually to the running guest).
+
+        """
         j = 0
         for dirpath, dirnames, filenames in os.walk(self.inject):
             for i in filenames:
@@ -90,6 +105,11 @@ class Ampuole:
         self.values['inject'] = self._inject
 
     def rewrite_cloudconfig(self):
+        """
+        Add SSH authorized keys to user data, mostly as insurance in case
+        metadata doesn't observe them.
+
+        """
         try:
             self._cloudconfig['ssh_authorized_keys'] = self._ssh_keys
         except TypeError:
@@ -100,6 +120,9 @@ class Ampuole:
         self.udfile.close()
 
     def write_metadata(self):
+        """
+        Create the metadata structure and render it out as JSON.
+        """
         metadata = dict()
         if len(self._ssh_keys) > 0:
             metadata['public_keys'] = dict()
@@ -124,20 +147,30 @@ class Ampuole:
         self.mdfile.close()
 
     def make_configdrive(self):
+        """
+        Use the assembled data to create the ISO image.
+        """
         prefix = os.path.join('openstack', 'latest')
         mdin = os.path.join(prefix, 'meta_data.json')
         udin = os.path.join(prefix, 'user_data')
         metadata = '{}={}'.format(mdin, self.mdfile.name)
         userdata = '{}={}'.format(udin, self.udfile.name)
-        cmd = ['mkisofs', '-J', '-r', '-R', '-o', self.output_iso, '-graft-points', metadata, userdata]
+        cmd = [
+            'mkisofs',
+            '-J', '-r', '-R',
+            '-o', self.output_iso,
+            '-graft-points',
+            metadata,
+            userdata,
+        ]
         for i in self._inject:
             logging.debug(i)
-            cmd.append('{}={}'.format(i['isopath'], i['local']))
+            graft = '{}={}'.format(i['isopath'], i['local']))
+            cmd.append(graft)
         logging.debug(cmd)
         subprocess.check_call(cmd)
         os.remove(self.mdfile.name)
         os.remove(self.udfile.name)
-
 
     def run(self):
         self.explore_user_data()
